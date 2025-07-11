@@ -1,7 +1,9 @@
+import SimpleCalculator from "./SimpleCalculator"
+
 function App() {
   return (
     <div>
-      hello world by Trishit
+      <SimpleCalculator />
     </div>
   )
 }
