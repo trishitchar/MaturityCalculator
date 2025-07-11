@@ -1,5 +1,9 @@
-import React, { useState } from "react";
-import { Calculator, AlertTriangle } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Download, Calculator, AlertTriangle, RotateCcw } from "lucide-react";
+import exportCSV from "./utils/exportCSV";
+import { exportJSON } from "./utils/exportJSON";
+import { exportDOCX } from "./utils/exportDOCX";
+import { exportPDF } from "./utils/exportPDF";
 
 interface Result {
   return: number;
@@ -9,16 +13,39 @@ interface Result {
 }
 
 const SimpleCalculator: React.FC = () => {
-  const [principal, setPrincipal] = useState<number>(1000);
-  const [interestRateYear, setInterestRateYear] = useState<number>(12.2);
-  const [threshold, setThreshold] = useState<number>(-10);
-  const [buffer, setBuffer] = useState<number>(10);
-  const [returnsText, setReturnsText] = useState<string>(
-    "60, 40, 20, 5, 0, -5, -10, -10.01, -20, -30, -40, -60, -80, -100, -200"
-  );
+  // default values for the calculator given 1000, 12.2, -10,10; 
+  // i also added extra Underlying Return for testing values like -110.1 or -200 ...etc,
+  const defaultValues = {
+    principal: 1000,
+    interestRateYear: 12.2,
+    threshold: -10,
+    buffer: 10,
+    returnsText: "60, 40, 20, 5, 0, -5, -10, -10.01, -20, -30, -40, -60, -80, -100, -110, -110.1, -200"
+  };
+
+  const [principal, setPrincipal] = useState<number>(defaultValues.principal);
+  const [interestRateYear, setInterestRateYear] = useState<number>(defaultValues.interestRateYear);
+  const [threshold, setThreshold] = useState<number>(defaultValues.threshold);
+  const [buffer, setBuffer] = useState<number>(defaultValues.buffer);
+  const [returnsText, setReturnsText] = useState<string>(defaultValues.returnsText);
+
+  const [interestRateYearStr, setInterestRateYearStr] = useState<string>(String(defaultValues.interestRateYear));
+  const [thresholdStr, setThresholdStr] = useState<string>(String(defaultValues.threshold));
+  const [bufferStr, setBufferStr] = useState<string>(String(defaultValues.buffer));
 
   const [results, setResults] = useState<Result[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
+
+  useEffect(() => {
+    const ir = parseFloat(interestRateYearStr);
+    if (!isNaN(ir)) setInterestRateYear(ir);
+
+    const th = parseFloat(thresholdStr);
+    if (!isNaN(th)) setThreshold(th);
+
+    const buf = parseFloat(bufferStr);
+    if (!isNaN(buf)) setBuffer(buf);
+  }, [interestRateYearStr, thresholdStr, bufferStr]);
 
   function generateMaturityTable(): void {
     const interestRateMonth = interestRateYear / 12;
@@ -47,7 +74,7 @@ const SimpleCalculator: React.FC = () => {
         prediction = "At Risk ";
 
         if (payment < 0) {
-          newWarnings.push(`Payment for ${ret}% can not be negative - set to 0`);
+          newWarnings.push(`Payment for ${ret}% cannot be negative - set to 0`);
           payment = 0;
         }
       }
@@ -64,8 +91,45 @@ const SimpleCalculator: React.FC = () => {
     setWarnings(newWarnings);
   }
 
+  // initial table generation
+  useEffect(() => {
+    generateMaturityTable();
+  }, []);
+
+  const getParameters = () => ({
+    principal,
+    interestRateYear,
+    interestRateMonth: interestRateYear / 12,
+    threshold,
+    buffer,
+  });
+
+  const handleExportCSV = () => exportCSV(results);
+  const handleExportJSON = () => exportJSON(results, getParameters());
+  const handleExportDOCX = () => exportDOCX(results, getParameters());
+  const handleExportPDF = () => exportPDF(results, getParameters());
+
+  // added reset so if user somehow forgets the previous value, also they can reload too..
+  const resetToDefaults = () => {
+    setPrincipal(defaultValues.principal);
+    setInterestRateYear(defaultValues.interestRateYear);
+    setThreshold(defaultValues.threshold);
+    setBuffer(defaultValues.buffer);
+    setReturnsText(defaultValues.returnsText);
+
+    setInterestRateYearStr(String(defaultValues.interestRateYear));
+    setThresholdStr(String(defaultValues.threshold));
+    setBufferStr(String(defaultValues.buffer));
+  };
+
   const protectedCount = results.filter((r) => r.prediction.includes("Protected")).length;
   const atRiskCount = results.filter((r) => r.prediction.includes("At Risk")).length;
+
+  const exportButtons = [{ label: "CSV", handler: handleExportCSV },
+    { label: "JSON", handler: handleExportJSON },
+    { label: "DOCX", handler: handleExportDOCX },
+    { label: "PDF", handler: handleExportPDF },
+  ];
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -78,20 +142,30 @@ const SimpleCalculator: React.FC = () => {
             <div>
               <label className="block text-sm font-medium">Principal ($)</label>
               <input
-                type="number"
+              //previously it was number but facing some issue while giving negetive input from my laptop keyboard, so I make it text input and added validation
+                type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 value={principal}
-                onChange={(e) => setPrincipal(Number(e.target.value))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+                    setPrincipal(value === '' ? 0 : Number(value) || 0);
+                  }
+                }}
               />
             </div>
             <div>
               <label className="block text-sm font-medium">Interest Rate Year (%)</label>
               <input
-                type="number"
-                step="0.01"
+                type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={interestRateYear}
-                onChange={(e) => setInterestRateYear(Number(e.target.value))}
+                value={interestRateYearStr}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+                    setInterestRateYearStr(value);
+                  }
+                }}
               />
             </div>
           </div>
@@ -99,19 +173,29 @@ const SimpleCalculator: React.FC = () => {
             <div>
               <label className="block text-sm font-medium">Threshold (%)</label>
               <input
-                type="number"
+                type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={threshold}
-                onChange={(e) => setThreshold(Number(e.target.value))}
+                value={thresholdStr}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+                    setThresholdStr(value);
+                  }
+                }}
               />
             </div>
             <div>
               <label className="block text-sm font-medium">Buffer (%)</label>
               <input
-                type="number"
+                type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={buffer}
-                onChange={(e) => setBuffer(Number(e.target.value))}
+                value={bufferStr}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+                    setBufferStr(value);
+                  }
+                }}
               />
             </div>
           </div>
@@ -124,13 +208,22 @@ const SimpleCalculator: React.FC = () => {
               onChange={(e) => setReturnsText(e.target.value)}
             />
           </div>
-          <button
-            onClick={generateMaturityTable}
-            className="w-full cursor-pointer flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
-          >
-            <Calculator className="w-4 h-4" />
-            Generate Table
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={generateMaturityTable}
+              className="flex-1 cursor-pointer flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+            >
+              <Calculator className="w-4 h-4" />
+              Generate Table
+            </button>
+            <button
+              onClick={resetToDefaults}
+              className="cursor-pointer flex items-center justify-center gap-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reset
+            </button>
+          </div>
         </div>
 
         <div className="border border-gray-300 rounded-xl p-6 shadow text-sm space-y-3">
@@ -167,10 +260,12 @@ const SimpleCalculator: React.FC = () => {
       {warnings.length > 0 && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-6">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="w-5 h-5 mt-1" />
             <div>
               {warnings.map((w, i) => (
-                <div key={i}>{w}</div>
+                <div key={i} className="flex items-start gap-2">
+                  <AlertTriangle className="w-5 h-5 mt-1" />
+                  <div>{w}</div>
+                </div>
               ))}
             </div>
           </div>
@@ -183,6 +278,18 @@ const SimpleCalculator: React.FC = () => {
             <h2 className="text-lg font-semibold flex items-center gap-2">
               Results ({results.length}) - {protectedCount} Protected, {atRiskCount} At Risk
             </h2>
+            <div className="flex gap-2 mt-3 sm:mt-0">
+              {exportButtons.map(({ label, handler }) => (
+                <button
+                  key={label}
+                  onClick={handler}
+                  className="flex items-center gap-1 border border-gray-300 px-3 py-1 rounded text-sm hover:bg-gray-100 cursor-pointer transition"
+                >
+                  <Download className="w-4 h-4" />
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="overflow-x-auto p-4">
             <table className="w-full border border-gray-300 text-sm">
