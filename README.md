@@ -1,4 +1,4 @@
-# Maturity Calculator by me, Trishit
+# Simple Maturity Calculator
 
 # to run this project copy this commands
 ```ts
