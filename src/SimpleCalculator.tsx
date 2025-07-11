@@ -230,24 +230,24 @@ const SimpleCalculator: React.FC = () => {
 
         <div className="border border-gray-300 rounded-xl p-6 shadow text-sm space-y-3">
           <h2 className="text-xl font-semibold mb-2">Info & Summary</h2>
-          <div>
+          <div className="space-y-2 mb-4">
             <p>
-              <strong>Interest Rate Month:</strong> {(interestRateYear / 12).toFixed(4)}%
+              <strong>Interest Rate Per Month:</strong> {(interestRateYear / 12).toFixed(4)}%
             </p>
             <p>
-              <strong>Monthly Interest:</strong> ${((principal * interestRateYear) / 12 / 100).toFixed(4)}
+              <strong>Monthly Interest Amount:</strong> ${((principal * interestRateYear) / 12 / 100).toFixed(4)}
             </p>
           </div>
-          <div>
+          <div className="space-y-2 mb-4">
             <p>
               <strong>Logic:</strong>
             </p>
-            <p>• If return ≥ {threshold}%: Protected (Principal + Interest)</p>
-            <p>• If return &lt; {threshold}%: At Risk (Buffer formula)</p>
+            <p>• If return ≥ {threshold}% : Protected (Principal + Interest)</p>
+            <p>• If return &lt; {threshold}% : At Risk (Buffer formula alredy given)</p>
             <hr className="border border-gray-200 mt-4 mb-2" />
           </div>
           {results.length > 0 && (
-            <div>
+            <div className="space-y-2">
               <p>
                 <strong>Current Results:</strong>
               </p>
