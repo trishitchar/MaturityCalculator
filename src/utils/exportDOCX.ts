@@ -39,8 +39,8 @@ export function exportDOCX(
         <h2>Results</h2>
         <table>
           <tr>
-            <th>Return (%)</th>
-            <th>Payment ($)</th>
+            <th>Underlying Return (%)</th>
+            <th>Payment at Maturity ($)</th>
             <th>Method</th>
             <th>Prediction</th>
           </tr>

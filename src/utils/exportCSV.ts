@@ -1,6 +1,6 @@
 export default function exportCSV(results: { return: number; payment: number; method: string; prediction: string }[]) {
   const csv = [
-    "Return (%),Payment ($),Method,Prediction",
+    "Underlying Return (%),Payment at Maturity ($),Method,Prediction",
     ...results.map((r) => `${r.return},${r.payment},${r.method},${r.prediction}`),
   ].join("\n");
 

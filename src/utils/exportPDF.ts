@@ -28,8 +28,8 @@ export function exportPDF(
       <h2>Results</h2>
       <table border="1" style="border-collapse: collapse; width: 100%;">
         <tr style="background: #f0f0f0;">
-          <th style="padding: 8px;">Return (%)</th>
-          <th style="padding: 8px;">Payment ($)</th>
+          <th style="padding: 8px;">Underlying Return (%)</th>
+          <th style="padding: 8px;">Payment at Maturity ($)</th>
           <th style="padding: 8px;">Method</th>
           <th style="padding: 8px;">Prediction</th>
         </tr>

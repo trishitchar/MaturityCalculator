@@ -297,8 +297,8 @@ const SimpleCalculator: React.FC = () => {
             <table className="w-full border border-gray-300 text-sm">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="border border-gray-300 px-3 py-2 text-left">Return (%)</th>
-                  <th className="border border-gray-300 px-3 py-2 text-left">Payment ($)</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left">Underlying Return (%)</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left">Payment at Maturity ($)</th>
                   <th className="border border-gray-300 px-3 py-2 text-left">Method</th>
                   <th className="border border-gray-300 px-3 py-2 text-left">Prediction</th>
                 </tr>
