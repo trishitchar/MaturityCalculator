@@ -76,7 +76,7 @@ const SimpleCalculator: React.FC = () => {
         prediction = "At Risk ";
 
         if (payment < 0) {
-          newWarnings.push(`Payment for ${ret}% cannot be negative - set to 0`);
+          newWarnings.push(`Payment at Maturity for ${ret}% cannot be negative - set to 0`);
           payment = 0;
         }
       }
@@ -242,8 +242,8 @@ const SimpleCalculator: React.FC = () => {
             <p>
               <strong>Logic:</strong>
             </p>
-            <p>• If return ≥ {threshold}% : Protected (Principal + Interest)</p>
-            <p>• If return &lt; {threshold}% : At Risk (Buffer formula alredy given)</p>
+            <p>• If Underlying Return ≥ {threshold}% : Protected (Principal + Interest)</p>
+            <p>• If Underlying Return &lt; {threshold}% : At Risk (Buffer formula alredy given)</p>
             <hr className="border border-gray-200 mt-4 mb-2" />
           </div>
           {results.length > 0 && (
