@@ -4,6 +4,7 @@ import exportCSV from "./utils/exportCSV";
 import { exportJSON } from "./utils/exportJSON";
 import { exportDOCX } from "./utils/exportDOCX";
 import { exportPDF } from "./utils/exportPDF";
+import toast from "react-hot-toast";
 
 interface Result {
   return: number;
@@ -48,6 +49,7 @@ const SimpleCalculator: React.FC = () => {
   }, [interestRateYearStr, thresholdStr, bufferStr]);
 
   function generateMaturityTable(): void {
+    toast.success("Maturity Table Generated");
     const interestRateMonth = interestRateYear / 12;
     const returns: number[] = returnsText
       .split(",")
